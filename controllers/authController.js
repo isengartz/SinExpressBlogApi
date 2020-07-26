@@ -54,7 +54,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     // role: req.body.role,
   });
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, httpCodes.HTTP_CREATED, res);
 });
 
 // Login
@@ -63,16 +63,20 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // Check if email password exists
   if (!email || !password) {
-    return next(new AppError('Provide email and password', 400));
+    return next(
+      new AppError('Provide email and password', httpCodes.HTTP_BAD_REQUEST)
+    );
   }
   // Check if user exists && password correct
   const user = await User.findOne({ email: email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError('Incorrect email or password', 401));
+    return next(
+      new AppError('Incorrect email or password', httpCodes.HTTP_UNAUTHORIZED)
+    );
   }
   // Send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, httpCodes.HTTP_OK, res);
 });
 
 // Middleware to restrict access to no login users
@@ -125,6 +129,18 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+// Adds the user id to body payload
+// Used for automatically add the logged in user when creating a blog or other resource
+// Must be used with and after protect middleware
+exports.addUserToBodyPayload = (req, res, next) => {
+  if (!req.user) {
+    return next(
+      new AppError('You need to login first', httpCodes.HTTP_UNAUTHORIZED)
+    );
+  }
+  req.body.user = req.user._id;
+  next();
+};
 
 // Creates a reset token and send it via email to user
 exports.forgotPassword = catchAsync(async (req, res, next) => {
@@ -142,7 +158,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  )}/api/v1/auth/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`;
 

@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Title is required'],
+  },
+  slug: {
+    type: String,
   },
   shortDescription: {
     type: String,
@@ -19,6 +23,21 @@ const blogSchema = new mongoose.Schema({
       type: String,
     },
   ],
+  label: {
+    type: String,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  hasPopUp: {
+    type: Boolean,
+    default: true,
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -26,6 +45,11 @@ const blogSchema = new mongoose.Schema({
   sorting: {
     type: Number,
   },
+});
+
+blogSchema.pre('save', function (next) {
+  this.slug = slugify(this.title, { lower: true });
+  next();
 });
 
 const Blog = mongoose.model('Blog', blogSchema);

@@ -45,14 +45,42 @@ exports.findAll = (Model) =>
 // Delete a document of given Model
 exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
+    const documentName = Model.collection.collectionName;
     const document = await Model.findByIdAndDelete(req.params.id);
     if (!document) {
       return next(
-        new AppError(`No document found with that ID`, httpCodes.HTTP_NOT_FOUND)
+        new AppError(
+          `No ${documentName} found with that ID`,
+          httpCodes.HTTP_NOT_FOUND
+        )
       );
     }
     res.status(httpCodes.HTTP_NO_CONTENT).json({
       status: 'success',
       data: null,
+    });
+  });
+
+// Updates a document of given Model
+exports.updateOne = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const documentName = Model.collection.collectionName;
+    const document = await Model.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!document) {
+      return next(
+        new AppError(
+          `No ${documentName} found with that ID`,
+          httpCodes.HTTP_NOT_FOUND
+        )
+      );
+    }
+    res.status(httpCodes.HTTP_OK).json({
+      status: 'success',
+      data: {
+        [documentName]: document,
+      },
     });
   });
