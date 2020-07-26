@@ -8,6 +8,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const blogRoutes = require('./routes/blogRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const tagRoutes = require('./routes/tagRoutes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ const API_ROOT_ENDPOINT = '/api/v1';
 app.use(`${API_ROOT_ENDPOINT}/blogs`, blogRoutes);
 app.use(`${API_ROOT_ENDPOINT}/auth`, authRoutes);
 app.use(`${API_ROOT_ENDPOINT}/users`, userRoutes);
+app.use(`${API_ROOT_ENDPOINT}/tags`, tagRoutes);
 
 // Handling unhandled routes
 app.all('*', (req, res, next) => {

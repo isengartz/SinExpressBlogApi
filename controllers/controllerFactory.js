@@ -1,6 +1,7 @@
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const httpCodes = require('../utils/httpStatuses');
+const ApiFeatures = require('../utils/apiFeatures');
 
 // Create a new document of given Model
 exports.createOne = (Model) =>
@@ -16,10 +17,15 @@ exports.createOne = (Model) =>
   });
 
 // Find one document of given Model
-exports.findOne = (Model) =>
+exports.findOne = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     const documentName = Model.collection.collectionName;
-    const document = await Model.findById(req.params.id);
+    // Populate extra data if needed
+    let query = Model.findById(req.params.id);
+    if (populateOptions) {
+      query = query.populate({ populateOptions });
+    }
+    const document = await query;
     res.status(httpCodes.HTTP_OK).json({
       status: 'success',
       data: {
@@ -32,12 +38,19 @@ exports.findOne = (Model) =>
 exports.findAll = (Model) =>
   catchAsync(async (req, res, next) => {
     const documentName = Model.collection.collectionName;
-    const document = await Model.find();
+
+    const features = new ApiFeatures(Model.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const documents = await features.query;
+
     res.status(httpCodes.HTTP_OK).json({
       status: 'success',
-      results: document.length,
+      results: documents.length,
       data: {
-        [documentName]: document,
+        [documentName]: documents,
       },
     });
   });

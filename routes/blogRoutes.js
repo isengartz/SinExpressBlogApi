@@ -11,13 +11,15 @@ router
     authController.protect,
     authController.addUserToBodyPayload,
     blogController.createBlog
-  )
+  );
+
+router
+  .route('/:id')
+  .get(blogController.getBlog)
   .patch(authController.protect, blogController.updateBlog)
   .delete(
     authController.protect,
     authController.restrictTo('admin'),
     blogController.deleteBlog
   );
-
-router.route('/:id').get(blogController.getBlog);
 module.exports = router;

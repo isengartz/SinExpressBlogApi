@@ -18,11 +18,6 @@ const blogSchema = new mongoose.Schema({
   featuredImage: {
     type: String,
   },
-  tags: [
-    {
-      type: String,
-    },
-  ],
   label: {
     type: String,
   },
@@ -38,6 +33,12 @@ const blogSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
   },
+  tags: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Tag',
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -47,6 +48,7 @@ const blogSchema = new mongoose.Schema({
   },
 });
 
+// Add slug by slugify title
 blogSchema.pre('save', function (next) {
   this.slug = slugify(this.title, { lower: true });
   next();
