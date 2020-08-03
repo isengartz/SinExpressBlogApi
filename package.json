@@ -4,15 +4,17 @@
   "description": "Simple Api to get the fake blogs for the portfolio app",
   "main": "index.js",
   "scripts": {
+    "start" : "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js",
+    "start:prod": "NODE_ENV=production node server.js",
     "debug": "ndb server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "dotenv": "^8.2.0",
     "eslint-plugin-prettier": "^3.1.4",
     "express": "^4.17.1",

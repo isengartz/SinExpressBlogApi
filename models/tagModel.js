@@ -11,7 +11,7 @@ const tagSchema = mongoose.Schema({
       ref: 'Blog',
     },
   ],
-  icon: String,
+  image: String,
   createdAt: {
     type: Date,
     default: Date.now(),
