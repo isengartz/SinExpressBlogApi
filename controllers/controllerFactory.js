@@ -1,13 +1,41 @@
+const path = require('path');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const httpCodes = require('../utils/httpStatuses');
 const ApiFeatures = require('../utils/apiFeatures');
-
+const downloadFile = require('../utils/downloadFile');
 // Create a new document of given Model
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const documentName = Model.collection.collectionName;
     const document = await Model.create(req.body);
+    res.status(httpCodes.HTTP_CREATED).json({
+      status: 'success',
+      data: {
+        [documentName]: document,
+      },
+    });
+  });
+
+// Downloads also a file
+// @downloadableEntity is the column where the image is
+exports.createOneWithDownloadFile = (Model, downloadableEntity) =>
+  catchAsync(async (req, res, next) => {
+    const documentName = Model.collection.collectionName;
+    const document = await Model.create(req.body);
+    if (document && req.body[downloadableEntity]) {
+      const imageName = req.body[downloadableEntity].split('/').pop();
+
+      const pathToSave = path.resolve(
+        `${process.cwd()}/public/images/${imageName}`
+      );
+
+      await downloadFile(req.body[downloadableEntity], pathToSave).catch(() => {
+        console.log('Image Failed to get Saved. Unlucky xD');
+      });
+
+      // Should update the donwloadableEntity with the local path here but meh not gonna use it at all xD
+    }
     res.status(httpCodes.HTTP_CREATED).json({
       status: 'success',
       data: {

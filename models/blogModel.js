@@ -18,14 +18,7 @@ const blogSchema = new mongoose.Schema({
   featuredImage: {
     type: String,
   },
-  label: {
-    type: String,
-  },
   isActive: {
-    type: Boolean,
-    default: true,
-  },
-  hasPopUp: {
     type: Boolean,
     default: true,
   },

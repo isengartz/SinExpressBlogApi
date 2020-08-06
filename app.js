@@ -46,6 +46,9 @@ app.use(`${API_ROOT_ENDPOINT}/auth`, authRoutes);
 app.use(`${API_ROOT_ENDPOINT}/users`, userRoutes);
 app.use(`${API_ROOT_ENDPOINT}/tags`, tagRoutes);
 
+// Static Files
+app.use(express.static('public'));
+
 // Handling unhandled routes
 app.all('*', (req, res, next) => {
   next(
